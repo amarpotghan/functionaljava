@@ -1,12 +1,10 @@
 package fj.data;
 
-import fj.Effect;
 import fj.Equal;
 import fj.Hash;
 import fj.Show;
 import fj.F;
 import fj.F2;
-import fj.F3;
 import fj.Function;
 import fj.Monoid;
 import fj.Ord;
@@ -716,6 +714,16 @@ public abstract class Stream<A> implements Iterable<A> {
                                                 : some(P.p(as[i], P.p(as, i + 1)))), P.p(as, 0));
   }
 
+
+  public static <A> Stream<A> stream(Iterable<A> it) {
+    return iterableStream(it);
+  }
+
+  public static <A> Stream<A> stream(Iterator<A> it) {
+    return iteratorStream(it);
+  }
+
+
   /**
    * Returns a stream that is either infinite or bounded up to the maximum value of the given iterator starting at the
    * given value and stepping at increments of <code>1</code>.
@@ -1239,8 +1247,7 @@ public abstract class Stream<A> implements Iterable<A> {
 
   @Override
   public boolean equals(Object other) {
-    return !Equal.equalsValidationCheck(this, other) ? false :
-            Equal.streamEqual(Equal.<A>anyEqual()).eq(this, (Stream<A>) other);
+    return Equal.shallowEqualsO(this, other).orSome(P.lazy(u -> Equal.streamEqual(Equal.<A>anyEqual()).eq(this, (Stream<A>) other)));
   }
 
   @Override

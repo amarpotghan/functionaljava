@@ -32,7 +32,6 @@ import static fj.data.Validation.parseInt;
 import static fj.data.Validation.parseLong;
 import static fj.data.Validation.parseShort;
 import static fj.Show.optionShow;
-import static fj.Show.anyShow;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -627,8 +626,7 @@ public abstract class Option<A> implements Iterable<A> {
 
   @Override
   public boolean equals(Object other) {
-    return !Equal.equalsValidationCheck(this, other) ? false :
-            Equal.optionEqual(Equal.<A>anyEqual()).eq(this, (Option<A>) other);
+    return Equal.shallowEqualsO(this, other).orSome(P.lazy(u -> Equal.optionEqual(Equal.<A>anyEqual()).eq(this, (Option<A>) other)));
   }
 
   /**

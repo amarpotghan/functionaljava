@@ -37,8 +37,7 @@ public final class TreeMap<K, V> implements Iterable<P2<K, V>> {
 
   @Override
   public boolean equals(Object other) {
-    return !Equal.equalsValidationCheck(this, other) ? false :
-            Equal.treeMapEqual(Equal.<K>anyEqual(), Equal.<V>anyEqual()).eq(this, (TreeMap<K, V>) other);
+    return Equal.shallowEqualsO(this, other).orSome(P.lazy(u -> Equal.treeMapEqual(Equal.<K>anyEqual(), Equal.<V>anyEqual()).eq(this, (TreeMap<K, V>) other)));
   }
 
   @Override
@@ -305,5 +304,38 @@ public final class TreeMap<K, V> implements Iterable<P2<K, V>> {
     final Ord<K> o = tree.ord().comap(coord);
     return new TreeMap<K, W>(tree.map(TreeMap.<K, Option<W>>ord(o), g));
   }
+
+  	/**
+	 * The expression <code>t1.union(t2)</code> takes the left-biased union of <code>t1</code>
+	 * and <code>t2</code>. It prefers <code>t1</code> when duplicate keys are encountered.
+	 *
+	 * @param t2 The other tree we wish to combine with this one
+	 * @return The combined TreeMap
+	 */
+	public TreeMap<K, V> union(TreeMap<K, V> t2) {
+		// TODO This could be implemented more efficiently using "hedge union"
+		TreeMap<K, V> result = t2;
+		for(P2<K,V> p : this) {
+			result = result.set(p._1(), p._2());
+		}
+		return result;
+	}
+
+  	/**
+	 * The expression <code>t1.union(t2)</code> takes the left-biased union of <code>t1</code>
+	 * and <code>t2</code>. It prefers <code>t1</code> when duplicate keys are encountered.
+	 *
+	 * @param t2 The other list/set of pairs we wish to combine with this one
+	 * @return The combined TreeMap
+	 */
+	public TreeMap<K, V> union(Iterable<P2<K, V>> t2) {
+		TreeMap<K, V> result = this;
+		for(P2<K,V> p : t2) {
+			if(!this.contains(p._1())) {
+				result = result.set(p._1(), p._2());
+			}
+		}
+		return result;
+	}
 
 }

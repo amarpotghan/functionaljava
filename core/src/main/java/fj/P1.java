@@ -2,10 +2,21 @@ package fj;
 
 import java.lang.ref.SoftReference;
 
-import fj.data.*;
+import fj.data.Array;
+import fj.data.List;
+import fj.data.Stream;
+import fj.data.Either;
+import fj.data.Option;
+import fj.data.Validation;
+//import fj.data.*;
 import fj.function.Try0;
 
-public abstract class P1<A> {
+public abstract class P1<A> implements F0<A> {
+
+    @Override
+    public A f() {
+        return _1();
+    }
 
     /**
      * Access the first element of the product.
@@ -243,8 +254,7 @@ public abstract class P1<A> {
     @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object other) {
-        return Equal.equalsValidationCheck(this, other)
-                && Equal.p1Equal(Equal.<A>anyEqual()).eq(this, (P1<A>) other);
+        return Equal.shallowEqualsO(this, other).orSome(P.lazy(u -> Equal.p1Equal(Equal.<A>anyEqual()).eq(this, (P1<A>) other)));
     }
 
     @Override

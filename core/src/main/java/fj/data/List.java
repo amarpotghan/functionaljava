@@ -1331,6 +1331,10 @@ public abstract class List<A> implements Iterable<A> {
     return foldLeft1(o.min);
   }
 
+  public final java.util.List<A> toJavaList() {
+    return new java.util.LinkedList<A>(toCollection());
+  }
+
   /**
    * Projects an immutable collection of this list.
    *
@@ -1410,6 +1414,15 @@ public abstract class List<A> implements Iterable<A> {
    */
   public static <A> List<A> list(final A... as) {
     return Array.array(as).toList();
+  }
+
+
+  public static <A> List<A> list(final Iterable<A> i) {
+    return iterableList(i);
+  }
+
+  public static <A> List<A> list(final Iterator<A> it) {
+    return iterableList(() -> it);
   }
 
   /**
@@ -1864,8 +1877,7 @@ public abstract class List<A> implements Iterable<A> {
         //Casting to List<A> here does not cause a runtime exception even if the type arguments don't match.
         //The cast is done to avoid the compiler warning "raw use of parameterized class 'List'"
 
-        return !Equal.equalsValidationCheck(this, obj) ? false :
-                Equal.listEqual(Equal.<A>anyEqual()).eq(this, (List<A>) obj);
+        return Equal.shallowEqualsO(this, obj).orSome(P.lazy(u -> Equal.listEqual(Equal.<A>anyEqual()).eq(this, (List<A>) obj)));
     }
 
     /**
