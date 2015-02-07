@@ -56,13 +56,13 @@ public class BooleansTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testAndAll(){
-        F<String, Boolean> f1 = a -> a.startsWith("fj");
+        F<String, Boolean> f1 = a -> a.endsWith("fj");
         F<String, Boolean> f2 = a -> a.startsWith("someOtherPackage");
         F<String, Boolean> f3 = a -> a.length() < 20;
 
-        F<String, Boolean> f4 = Booleans.andAll(Stream.<F<String, Boolean>>stream(f2, f2, f3));
+        F<String, Boolean> f4 = Booleans.andAll(Stream.<F<String, Boolean>>stream(f1, f2, f3));
 
-        Assert.assertTrue(f4.f("someOtherPackage"));
+        Assert.assertTrue(f4.f("someOtherPackage.fj"));
         Assert.assertFalse(f4.f("otther"));
         Assert.assertFalse(f4.f("someOtherPackage.fj.data.something.really.big"));
 
